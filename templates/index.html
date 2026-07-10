@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>ResumeForge | AI-Powered Resume Intelligence Platform</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+<div class="container">
+
+    <div class="logo-container">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ResumeForge Logo" class="logo">
+        <h1>ResumeForge</h1>
+    </div>
+
+    <p>Forge a Resume That Gets You Hired.</p>
+
+    <form action="/analyze" method="POST" enctype="multipart/form-data">
+
+        <!-- Resume Upload -->
+
+        <label><b>Upload Resume (PDF)</b></label>
+
+        <br><br>
+
+        <input
+            type="file"
+            name="resume"
+            accept=".pdf"
+            required>
+
+        <br><br><br>
+
+        <!-- Job Role -->
+
+        <label><b>Select Job Role</b></label>
+
+        <br><br>
+
+        <select
+            id="jobRole"
+            onchange="fillJobDescription()">
+
+            <option value="">-- Select Job Role --</option>
+            <option value="Software Developer">Software Developer</option>
+            <option value="Full Stack Developer">Full Stack Developer</option>
+            <option value="Java Developer">Java Developer</option>
+            <option value="Python Developer">Python Developer</option>
+            <option value="Data Analyst">Data Analyst</option>
+
+        </select>
+
+        <br><br><br>
+
+        <!-- Job Description -->
+
+        <label><b>Job Description</b></label>
+
+        <br><br>
+
+        <textarea
+            id="job_description"
+            name="job_description"
+            rows="12"
+            required
+            placeholder="Select a Job Role or paste your own Job Description here..."></textarea>
+
+        <br><br>
+
+        <button type="submit">
+            🚀 Analyze Resume
+        </button>
+
+    </form>
+
+</div>
+<script>
+const jobRoles = {
+
+"Software Developer":
+`We are looking for a Software Developer with strong knowledge of Java, Python, SQL, Git, HTML, CSS, JavaScript, Flask, React and REST APIs.
+
+The candidate should have experience in developing web applications, database management, object-oriented programming, problem solving and version control using Git.
+
+Good communication skills and teamwork are preferred.`,
+
+"Full Stack Developer":
+`We are looking for a Full Stack Developer with experience in HTML, CSS, JavaScript, React, Node.js, Express.js, MongoDB, SQL, Git and REST APIs.
+
+The candidate should be able to build responsive web applications, develop backend APIs and work with databases.`,
+
+"Java Developer":
+`We are hiring a Java Developer with strong knowledge of Java, Spring Boot, Hibernate, JDBC, SQL, Git and REST APIs.
+
+Candidates should understand Object-Oriented Programming, Collections Framework, Exception Handling and Database Connectivity.`,
+
+"Python Developer":
+`We are looking for a Python Developer with experience in Python, Flask, Django, SQL, Git and REST APIs.
+
+Candidates should have knowledge of web development, API development and database management.`,
+
+"Data Analyst":
+`We are looking for a Data Analyst with expertise in Python, SQL, Excel, Power BI, Tableau, Pandas and NumPy.
+
+The candidate should be able to analyze business data, create dashboards and generate reports.`
+
+};
+
+function fillJobDescription(){
+
+    const role = document.getElementById("jobRole").value;
+
+    if(role !== ""){
+
+        document.getElementById("job_description").value = jobRoles[role];
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>ResumeForge | AI-Powered Resume Intelligence Platform</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/result.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- PAGE HEADING -->
+
+    <h1>🤖 Resume Forge</h1>
+    <p class="subtitle">
+
+        Analyze • Optimize • Get Shortlisted
+
+    </p>
+
+    <!-- ========================= -->
+    <!-- TOP DASHBOARD -->
+    <!-- ========================= -->
+
+    <div class="cards">
+
+        <!-- ATS SCORE -->
+
+        <div class="score-card">
+
+            <h2>ATS Score</h2>
+
+            <div class="circle"
+                 style="--score: {{ ats_score }};">
+
+                <div class="circle-inner">
+
+                    {{ "%.2f"|format(ats_score) }}%
+
+                </div>
+
+            </div>
+
+            <h2>Resume Rating</h2>
+
+            <h3>{{ resume_rating }}</h3>
+
+        </div>
+
+        <!-- Resume Success Meter -->
+
+        <div class="cards">
+
+            <div class="card">
+
+                <h2>🏆 Resume Success Meter</h2>
+
+                <h1>{{ resume_success.score }}%</h1>
+
+                <h3>{{ resume_success.stars }}</h3>
+
+                <h4>Recruiter Interest</h4>
+
+                <h2>{{ resume_success.interest }}</h2>
+
+                <hr>
+
+                <h3>💪 Top Strengths</h3>
+
+                <ul>
+                    {% for item in resume_success.strengths %}
+                        <li>✅ {{ item }}</li>
+                    {% endfor %}
+                </ul>
+
+                <hr>
+
+                <h3>⚠ Needs Improvement</h3>
+
+                <ul>
+                    {% for item in resume_success.improvements %}
+                        <li>🔸 {{ item }}</li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+
+        </div>
+
+        <!-- JOB FIT -->
+
+        <div class="card">
+
+            <h2>🎯 Job Fit Prediction</h2>
+
+            <h1>{{ job_fit.score }}%</h1>
+
+            <progress
+                value="{{ job_fit.score }}"
+                max="100">
+            </progress>
+
+            <br><br>
+
+            <h3>{{ job_fit.verdict }}</h3>
+
+            <p>
+
+                {% if job_fit.score >= 80 %}
+
+                    🟢 Excellent chance of getting shortlisted.
+
+                {% elif job_fit.score >= 60 %}
+
+                    🟡 Good chance of getting shortlisted.
+
+                {% else %}
+
+                    🔴 Improve missing skills to increase your chances.
+
+                {% endif %}
+
+            </p>
+
+        </div>
+
+        <!-- RESUME HEALTH -->
+
+        <div class="card">
+
+            <h2>❤️ Resume Health</h2>
+
+            <h1>{{ resume_health.score }}%</h1>
+
+            <progress
+                value="{{ resume_health.score }}"
+                max="100">
+            </progress>
+
+            <hr>
+
+            <p>
+                📧 Email
+                {% if email %} ✅ {% else %} ❌ {% endif %}
+            </p>
+
+            <p>
+                📱 Phone
+                {% if phone %} ✅ {% else %} ❌ {% endif %}
+            </p>
+
+            <p>
+                💻 GitHub
+                {% if github %} ✅ {% else %} ❌ {% endif %}
+            </p>
+
+            <p>
+                💼 LinkedIn
+                {% if resume_health.linkedin %} ✅ {% else %} ❌ {% endif %}
+            </p>
+
+            <p>
+                🏆 Achievements
+                {% if resume_health.achievements %} ✅ {% else %} ❌ {% endif %}
+            </p>
+
+            <hr>
+
+            <h3>
+
+                {% if resume_health.score >= 85 %}
+
+                    🟢 Excellent Resume
+
+                {% elif resume_health.score >= 70 %}
+
+                    🟡 Good Resume
+
+                {% elif resume_health.score >= 50 %}
+
+                    🟠 Average Resume
+
+                {% else %}
+
+                    🔴 Needs Improvement
+
+                {% endif %}
+
+            </h3>
+
+        </div>
+
+    </div>
+
+    <!-- DOWNLOAD REPORT -->
+
+    <div class="download-section">
+
+        <a href="/download">
+
+            <button class="download-btn">
+
+                📥 Download PDF Report
+
+            </button>
+
+        </a>
+
+    </div>
+
+    <!-- DASHBOARD -->
+
+    <div class="cards">
+
+        <!-- Analysis Summary -->
+
+        <div class="card">
+
+            <h2>📊 Analysis Summary</h2>
+
+            <p>
+
+                <strong>Matched Skills:</strong>
+
+                {{ matched_count }}
+
+            </p>
+
+            <p>
+
+                <strong>Missing Skills:</strong>
+
+                {{ missing_count }}
+
+            </p>
+
+            <p>
+
+                <strong>Required Skills:</strong>
+
+                {{ required_count }}
+
+            </p>
+
+        </div>
+
+
+        <!-- Resume Score Breakdown -->
+
+        <div class="card">
+
+            <h2>📊 Resume Score Breakdown</h2>
+
+            <p><strong>Technical Skills</strong></p>
+            <progress value="{{ score_breakdown.skills }}" max="40"></progress>
+            <p>{{ score_breakdown.skills }}/40</p>
+
+            <p><strong>Projects</strong></p>
+            <progress value="{{ score_breakdown.projects }}" max="20"></progress>
+            <p>{{ score_breakdown.projects }}/20</p>
+
+            <p><strong>Education</strong></p>
+            <progress value="{{ score_breakdown.education }}" max="15"></progress>
+            <p>{{ score_breakdown.education }}/15</p>
+
+            <p><strong>Experience</strong></p>
+            <progress value="{{ score_breakdown.experience }}" max="15"></progress>
+            <p>{{ score_breakdown.experience }}/15</p>
+
+            <p><strong>Certifications</strong></p>
+            <progress value="{{ score_breakdown.certifications }}" max="10"></progress>
+            <p>{{ score_breakdown.certifications }}/10</p>
+
+            <hr>
+
+            <h3>Total Score : {{ score_breakdown.total }}/100</h3>
+
+        </div>
+
+        <!-- Resume Strength -->
+
+        <div class="card">
+
+            <h2>💪 Resume Strength</h2>
+
+            <p>Technical Skills</p>
+
+            <progress
+                value="{{ strength.technical }}"
+                max="100">
+            </progress>
+
+            <p>{{ strength.technical }}%</p>
+
+            <p>Education</p>
+
+            <progress
+                value="{{ strength.education }}"
+                max="100">
+            </progress>
+
+            <p>{{ strength.education }}%</p>
+
+            <p>Experience</p>
+
+            <progress
+                value="{{ strength.experience }}"
+                max="100">
+            </progress>
+
+            <p>{{ strength.experience }}%</p>
+
+            <p>Projects</p>
+
+            <progress
+                value="{{ strength.projects }}"
+                max="100">
+            </progress>
+
+            <p>{{ strength.projects }}%</p>
+
+            <p>Certifications</p>
+
+            <progress
+                value="{{ strength.certifications }}"
+                max="100">
+            </progress>
+
+            <p>{{ strength.certifications }}%</p>
+
+        </div>
+
+        <!-- ========================= -->
+        <!-- Resume Section Analysis -->
+        <!-- ========================= -->
+
+        <div class="cards">
+
+            <div class="card suggestion-card">
+
+                <h2>📑 Resume Section Analysis</h2>
+
+                <table class="section-table">
+
+                    <tr>
+                        <th>Section</th>
+                        <th>Rating</th>
+                        <th>Score</th>
+                    </tr>
+
+                    <tr>
+                        <td>🎓 Education</td>
+                        <td>{{ section_analysis.education.stars }}<br>{{ section_analysis.education.rating }}</td>
+                        <td>{{ section_analysis.education.score }}%</td>
+                    </tr>
+
+                    <tr>
+                        <td>💼 Experience</td>
+                        <td>{{ section_analysis.experience.stars }}<br>{{ section_analysis.experience.rating }}</td>
+                        <td>{{ section_analysis.experience.score }}%</td>
+                    </tr>
+
+                    <tr>
+                        <td>🚀 Projects</td>
+                        <td>{{ section_analysis.projects.stars }}<br>{{ section_analysis.projects.rating }}</td>
+                        <td>{{ section_analysis.projects.score }}%</td>
+                    </tr>
+
+                    <tr>
+                        <td>💻 Skills</td>
+                        <td>{{ section_analysis.skills.stars }}<br>{{ section_analysis.skills.rating }}</td>
+                        <td>{{ section_analysis.skills.score }}%</td>
+                    </tr>
+
+                    <tr>
+                        <td>📜 Certifications</td>
+                        <td>{{ section_analysis.certifications.stars }}<br>{{ section_analysis.certifications.rating }}</td>
+                        <td>{{ section_analysis.certifications.score }}%</td>
+                    </tr>
+
+                </table>
+
+            </div>
+
+        </div>
+
+            <!-- Resume Completeness -->
+
+        <div class="card">
+
+            <h2>📋 Resume Completeness</h2>
+
+            <h3>{{ completeness_score }}%</h3>
+
+            <progress value="{{ completeness_score }}" max="100"></progress>
+
+            <br><br>
+
+            <p>
+                📧 Email :
+                {% if email %}
+                    ✅ Found
+                {% else %}
+                    ❌ Missing
+                {% endif %}
+            </p>
+
+            <p>
+                📱 Phone :
+                {% if phone %}
+                    ✅ Found
+                {% else %}
+                    ❌ Missing
+                {% endif %}
+            </p>
+
+            <p>
+                💻 GitHub :
+                {% if github %}
+                    ✅ Found
+                {% else %}
+                    ❌ Missing
+                {% endif %}
+            </p>
+
+            <p>
+                🎓 Education :
+                {% if education %}
+                    ✅ Found
+                {% else %}
+                    ❌ Missing
+                {% endif %}
+            </p>
+
+            <p>
+                💼 Experience :
+                {% if experience %}
+                    ✅ Found
+                {% else %}
+                    ❌ Missing
+                {% endif %}
+            </p>
+
+             <p>
+                🚀 Projects :
+                {% if projects %}
+                    ✅ Found
+                {% else %}
+                    ❌ Missing
+                {% endif %}
+            </p>
+
+            <p>
+                🏆 Certifications :
+                {% if certifications %}
+                    ✅ Found
+                {% else %}
+                    ❌ Missing
+                {% endif %}
+            </p>
+
+        </div>
+
+        <!-- ========================= -->
+        <!-- PROJECT QUALITY ANALYSIS -->
+        <!-- ========================= -->
+
+        <div class="card">
+
+            <h2>🚀 Project Quality Analysis</h2>
+
+            <p>
+                <strong>Projects Found:</strong>
+                {{ project_analysis.project_count }}
+            </p>
+
+            <p>
+                <strong>Project Quality Score:</strong>
+                {{ project_analysis.score }}%
+            </p>
+
+            <progress
+                value="{{ project_analysis.score }}"
+                max="100">
+            </progress>
+
+            <br><br>
+
+            <p>
+                <strong>GitHub:</strong>
+
+                {% if project_analysis.github %}
+                    ✅ Present
+                {% else %}
+                    ❌ Missing
+                {% endif %}
+            </p>
+
+            <p>
+                <strong>Deployment:</strong>
+
+                {% if project_analysis.deployment %}
+                    ✅ Present
+                {% else %}
+                    ❌ Missing
+                {% endif %}
+            </p>
+
+            <h3>🛠 Technologies Used</h3>
+
+            <ul>
+
+                {% if project_analysis.technologies %}
+
+                    {% for tech in project_analysis.technologies %}
+
+                        <li>{{ tech }}</li>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <li>No technologies detected.</li>
+
+                {% endif %}
+
+            </ul>
+
+            <h3>⚡ Action Verbs</h3>
+
+            <ul>
+
+                {% if project_analysis.action_verbs %}
+
+                    {% for verb in project_analysis.action_verbs %}
+
+                        <li>{{ verb }}</li>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <li>No action verbs detected.</li>
+
+                {% endif %}
+
+            </ul>
+
+        </div>
+
+        <div class="card">
+
+            <h2>💡 Project Improvement Suggestions</h2>
+
+            <ul>
+
+                {% if project_analysis.suggestions %}
+
+                    {% for suggestion in project_analysis.suggestions %}
+
+                        <li>{{ suggestion }}</li>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <li>Excellent project portfolio! 🎉</li>
+
+                {% endif %}
+
+            </ul>
+
+        </div>
+            
+                <!-- ATS Score Explanation -->
+
+        <div class="card">
+
+            <h2>📊 ATS Score Explanation</h2>
+
+            <p>
+
+                <strong>Formula:</strong>
+
+            </p>
+
+            <p>{{ formula }}</p>
+
+            <hr>
+
+            <p>
+
+                <strong>Matched Required Skills</strong>
+
+            </p>
+
+            <ul>
+
+                {% if matched_required %}
+
+                    {% for skill in matched_required %}
+
+                        <li>✅ {{ skill }}</li>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <li>No matched required skills found.</li>
+
+                {% endif %}
+
+            </ul>
+
+        </div>
+
+        <!-- Resume Sections -->
+
+        <div class="card">
+
+            <h2>📄 Resume Sections</h2>
+
+            <p>
+
+                🎓 <strong>Education:</strong>
+
+                {% if education %}
+
+                    ✅ Found
+
+                {% else %}
+
+                    ❌ Missing
+
+                {% endif %}
+
+            </p>
+
+            <p>
+
+                💼 <strong>Experience:</strong>
+
+                {% if experience %}
+
+                    ✅ Found
+
+                {% else %}
+
+                    ❌ Missing
+
+                {% endif %}
+
+            </p>
+
+            <p>
+
+                🚀 <strong>Projects:</strong>
+
+                {% if projects %}
+
+                    ✅ Found
+
+                {% else %}
+
+                    ❌ Missing
+
+                {% endif %}
+
+            </p>
+
+            <p>
+
+                🏆 <strong>Certifications:</strong>
+
+                {% if certifications %}
+
+                    ✅ Found
+
+                {% else %}
+
+                    ❌ Missing
+
+                {% endif %}
+
+            </p>
+
+        </div>
+
+        <!-- Skill Analysis Chart -->
+
+        <div class="card">
+
+            <h2>📈 Skill Analysis Chart</h2>
+
+            <canvas id="skillChart"></canvas>
+
+        </div>
+
+    </div>
+
+    <!-- SKILLS SECTION -->
+    <div class="cards">
+
+        <!-- Matched Skills -->
+
+        <div class="card">
+
+            <h2>✅ Matched Skills</h2>
+
+            <ul>
+
+                {% if matched_skills %}
+
+                    {% for skill in matched_skills %}
+
+                        <li>{{ skill }}</li>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <li>No matched skills found.</li>
+
+                {% endif %}
+
+            </ul>
+
+        </div>
+
+        <!-- Missing Skills -->
+
+        <div class="card">
+
+            <h2>❌ Missing Skills</h2>
+
+            <ul>
+
+                {% if missing_skills %}
+
+                    {% for skill in missing_skills %}
+
+                        <li>{{ skill }}</li>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <li>🎉 No missing skills!</li>
+
+                {% endif %}
+
+            </ul>
+
+        </div>
+
+        <!-- Required Skills -->
+
+        <div class="card">
+
+            <h2>📋 Required Skills</h2>
+
+            <ul>
+
+                {% if required_skills %}
+
+                    {% for skill in required_skills %}
+
+                        <li>{{ skill }}</li>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <li>No required skills detected.</li>
+
+                {% endif %}
+
+            </ul>
+
+        </div>
+
+    </div>
+    
+    <!-- SUGGESTIONS -->
+
+    <div class="cards">
+
+        <div class="card">
+
+            <h2>💡 Suggestions</h2>
+
+            <ul>
+
+                {% if suggestions %}
+
+                    {% for suggestion in suggestions %}
+
+                        <li>{{ suggestion }}</li>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <li>Your resume looks excellent.</li>
+
+                {% endif %}
+
+            </ul>
+
+        </div>
+
+        <!-- AI Resume Feedback -->
+
+        <div class="card">
+
+            <h2>🤖 AI Resume Feedback</h2>
+
+            <ul>
+
+                {% if ai_feedback %}
+
+                    {% for item in ai_feedback %}
+
+                        <li>{{ item }}</li>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <li>No AI feedback available.</li>
+
+                {% endif %}
+
+            </ul>
+
+        </div>
+
+    </div>
+
+    <!-- RECRUITER REVIEW -->
+
+    <div class="cards">
+
+        <div class="card">
+
+            <h2>👨‍💼 Recruiter's Review</h2>
+
+            <p>{{ recruiter_review }}</p>
+
+        </div>
+
+    </div>
+
+    <!-- INTERVIEW QUESTIONS -->
+    <div class="cards">
+
+        <div class="card">
+
+            <h2>🎤 AI Interview Questions</h2>
+
+            {% if interview_questions %}
+
+                {% for skill, questions in interview_questions.items() %}
+
+                    <h3>{{ skill }}</h3>
+
+                    <ul>
+
+                        {% for question in questions %}
+
+                            <li>{{ question }}</li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                {% endfor %}
+
+            {% else %}
+
+                <p>No interview questions available.</p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+<!-- Chart.js -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const ctx = document.getElementById('skillChart');
+
+new Chart(ctx, {
+
+    type: 'pie',
+
+    data: {
+
+        labels: [
+
+            'Matched Skills',
+
+            'Missing Skills'
+
+        ],
+
+        datasets: [{
+
+            data: [
+
+                {{ matched_count }},
+
+                {{ missing_count }}
+
+            ],
+
+            backgroundColor: [
+
+                '#4CAF50',
+
+                '#F44336'
+
+            ]
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        plugins: {
+
+            legend: {
+
+                position: 'bottom'
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+
+</body>
+
+</html>
