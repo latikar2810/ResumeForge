@@ -106,18 +106,6 @@ ResumeForge/
 
 ---
 
-## 📸 Screenshots
-
-### Home Page
-
-> *(Add screenshot here)*
-
-### Analysis Result
-
-> *(Add screenshot here)*
-
----
-
 ## ⚙ Installation
 
 Clone the repository
